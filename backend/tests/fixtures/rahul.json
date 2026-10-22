@@ -1,0 +1,27 @@
+{
+  "full_name": "Rahul Sharma",
+  "nationality": "India",
+  "degree_level_held": "bachelor",
+  "degree_level_target": "master",
+  "field_of_study": "Computer Science",
+  "institution": "Delhi Technological University",
+  "graduation_year": 2025,
+  "grade": {
+    "value": 8.2,
+    "scale": 10.0
+  },
+  "language_tests": [],
+  "target_countries": [
+    "Germany",
+    "Canada",
+    "Singapore"
+  ],
+  "interests": [
+    "Artificial Intelligence",
+    "Distributed Systems",
+    "Machine Learning"
+  ],
+  "budget_note": "Requires partial or full scholarship/tuition waiver to fund graduate studies",
+  "needs_funding": true,
+  "github_url": "https://github.com/torvalds"
+}

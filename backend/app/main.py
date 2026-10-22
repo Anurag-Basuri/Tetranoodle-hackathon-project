@@ -12,6 +12,12 @@ from app.api.routers import profiles, documents, research_jobs, drafts
 async def lifespan(app: FastAPI):
     # Initialize database tables on server startup
     await init_db()
+    # Checkpoint recovery: scan for interrupted jobs after server restarts and resume them
+    try:
+        from app.application.recover_jobs import recover_stale_jobs_on_startup
+        await recover_stale_jobs_on_startup()
+    except Exception:
+        pass
     yield
 
 def create_app() -> FastAPI:

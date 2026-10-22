@@ -18,26 +18,32 @@ class EventRepository:
         message: str,
         payload: Optional[Dict[str, Any]] = None,
     ) -> JobEventModel:
-        # Determine next monotonic sequence number for this job
-        stmt = select(func.coalesce(func.max(JobEventModel.seq), 0)).where(JobEventModel.job_id == job_id)
-        res = await self.session.execute(stmt)
-        max_seq = res.scalar() or 0
-        next_seq = max_seq + 1
+        # Determine next monotonic sequence number for this job with collision retry
+        for attempt in range(3):
+            stmt = select(func.coalesce(func.max(JobEventModel.seq), 0)).where(JobEventModel.job_id == job_id)
+            res = await self.session.execute(stmt)
+            max_seq = res.scalar() or 0
+            next_seq = max_seq + 1
 
-        event = JobEventModel(
-            job_id=job_id,
-            seq=next_seq,
-            agent=agent,
-            level=level,
-            type=event_type,
-            message=message,
-            payload=payload or {},
-            at=datetime.utcnow(),
-        )
-        self.session.add(event)
-        await self.session.commit()
-        await self.session.refresh(event)
-        return event
+            event = JobEventModel(
+                job_id=job_id,
+                seq=next_seq,
+                agent=agent,
+                level=level,
+                type=event_type,
+                message=message,
+                payload=payload or {},
+                at=datetime.utcnow(),
+            )
+            self.session.add(event)
+            try:
+                await self.session.commit()
+                await self.session.refresh(event)
+                return event
+            except Exception:
+                await self.session.rollback()
+                if attempt == 2:
+                    raise
 
     async def get_events(
         self,

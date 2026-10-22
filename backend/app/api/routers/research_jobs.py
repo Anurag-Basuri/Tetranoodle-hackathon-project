@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional, Dict, Any
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,7 +7,9 @@ from app.infrastructure.repositories.jobs import JobRepository
 from app.infrastructure.repositories.events import EventRepository
 from app.application.start_research import start_research_use_case
 from app.application.get_results import get_results_use_case
-from app.domain.errors import NotFoundError
+from app.application.job_runner import execute_research_job
+from app.domain.enums import JobStatus, AgentName
+from app.domain.errors import NotFoundError, ConflictError
 from app.api.schemas import JobCreateRequest, JobOut, EventsResponse, EventOut
 
 router = APIRouter(prefix="/research-jobs", tags=["Research Jobs"])
@@ -95,3 +98,82 @@ async def get_job_results(
 ) -> Dict[str, Any]:
     # Retrieve final Evidence-Backed Eligibility Report
     return await get_results_use_case(db, job_id)
+
+@router.post("/{job_id}/retry", status_code=status.HTTP_202_ACCEPTED, response_model=JobOut)
+async def retry_research_job(
+    job_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    # Resume interrupted or failed job from checkpoint
+    repo = JobRepository(db)
+    job = await repo.get_by_id(job_id)
+    if not job:
+        raise NotFoundError(f"Job {job_id} not found")
+
+    if job.status == JobStatus.RUNNING.value:
+        raise ConflictError(f"Job {job_id} is already currently running")
+    if job.status in (JobStatus.COMPLETED.value, JobStatus.COMPLETED_WITH_WARNINGS.value):
+        raise ConflictError(f"Job {job_id} has already completed successfully")
+
+    # Update status to RUNNING and spawn background execution
+    event_repo = EventRepository(db)
+    await repo.update_status(job_id, JobStatus.RUNNING)
+    await event_repo.emit_event(
+        job_id=job_id,
+        agent=AgentName.COORDINATOR.value,
+        level="info",
+        event_type="resumed",
+        message="Job resumed/retried by user.",
+    )
+    asyncio.create_task(execute_research_job(job_id))
+
+    updated_job = await repo.get_by_id(job_id)
+    return JobOut(
+        id=updated_job.id,
+        profile_id=updated_job.profile_id,
+        status=updated_job.status,
+        params=updated_job.params,
+        warnings=updated_job.warnings,
+        error=updated_job.error,
+        created_at=updated_job.created_at,
+        started_at=updated_job.started_at,
+        finished_at=updated_job.finished_at,
+    )
+
+@router.post("/{job_id}/cancel", response_model=JobOut)
+async def cancel_research_job(
+    job_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    # Cancel an in-flight or queued research job
+    repo = JobRepository(db)
+    job = await repo.get_by_id(job_id)
+    if not job:
+        raise NotFoundError(f"Job {job_id} not found")
+
+    if job.status in (JobStatus.COMPLETED.value, JobStatus.COMPLETED_WITH_WARNINGS.value, JobStatus.FAILED.value):
+        raise ConflictError(f"Cannot cancel job in terminal state: {job.status}")
+
+    if job.status != JobStatus.CANCELLED.value:
+        event_repo = EventRepository(db)
+        await repo.update_status(job_id, JobStatus.CANCELLED)
+        await event_repo.emit_event(
+            job_id=job_id,
+            agent=AgentName.COORDINATOR.value,
+            level="warning",
+            event_type="cancelled",
+            message="Research job cancelled by user request.",
+        )
+
+    updated_job = await repo.get_by_id(job_id)
+    return JobOut(
+        id=updated_job.id,
+        profile_id=updated_job.profile_id,
+        status=updated_job.status,
+        params=updated_job.params,
+        warnings=updated_job.warnings,
+        error=updated_job.error,
+        created_at=updated_job.created_at,
+        started_at=updated_job.started_at,
+        finished_at=updated_job.finished_at,
+    )

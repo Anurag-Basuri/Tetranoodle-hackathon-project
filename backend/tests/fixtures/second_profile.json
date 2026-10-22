@@ -1,0 +1,32 @@
+{
+  "full_name": "Ananya Iyer",
+  "nationality": "India",
+  "degree_level_held": "bachelor",
+  "degree_level_target": "master",
+  "field_of_study": "Biotechnology",
+  "institution": "Anna University",
+  "graduation_year": 2024,
+  "grade": {
+    "value": 8.9,
+    "scale": 10.0
+  },
+  "language_tests": [
+    {
+      "test": "IELTS",
+      "score": 7.5
+    }
+  ],
+  "target_countries": [
+    "United Kingdom",
+    "Germany",
+    "Sweden"
+  ],
+  "interests": [
+    "Computational Biology",
+    "Genomics",
+    "Bioinformatics Algorithms"
+  ],
+  "budget_note": "Looking for research assistantships, merit scholarships, or full tuition fellowships",
+  "needs_funding": true,
+  "github_url": "https://github.com/tiangolo"
+}

@@ -23,6 +23,11 @@ class ActiveJobExistsError(DomainError):
         super().__init__(message, code="CONFLICT")
 
 
+class ConflictError(DomainError):
+    def __init__(self, message: str = "Conflict with current state"):
+        super().__init__(message, code="CONFLICT")
+
+
 class NotReadyError(DomainError):
     def __init__(self, message: str = "Job results are not ready yet"):
         super().__init__(message, code="NOT_READY")

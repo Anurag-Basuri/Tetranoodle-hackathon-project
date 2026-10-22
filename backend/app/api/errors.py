@@ -6,6 +6,7 @@ from app.domain.errors import (
     NotFoundError,
     MissingTokenError,
     ActiveJobExistsError,
+    ConflictError,
     NotReadyError,
     RateLimitedError,
     AllProvidersFailed,
@@ -39,7 +40,7 @@ async def domain_error_handler(request: Request, exc: DomainError) -> JSONRespon
         return problem_details_response(status.HTTP_404_NOT_FOUND, exc.code, "Not Found", exc.message)
     if isinstance(exc, MissingTokenError):
         return problem_details_response(status.HTTP_401_UNAUTHORIZED, exc.code, "Unauthorized", exc.message)
-    if isinstance(exc, (ActiveJobExistsError, NotReadyError)):
+    if isinstance(exc, (ActiveJobExistsError, ConflictError, NotReadyError)):
         return problem_details_response(status.HTTP_409_CONFLICT, exc.code, "Conflict", exc.message)
     if isinstance(exc, RateLimitedError):
         return problem_details_response(status.HTTP_429_TOO_MANY_REQUESTS, exc.code, "Rate Limited", exc.message)

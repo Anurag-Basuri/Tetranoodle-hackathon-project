@@ -48,3 +48,36 @@ async def test_create_and_fetch_profile():
         bad_headers = {"X-Access-Token": "invalid_wrong_token"}
         bad_res = await client.get(f"/api/v1/profiles/{profile_id}", headers=bad_headers)
         assert bad_res.status_code == 404
+
+@pytest.mark.asyncio
+async def test_cancel_and_retry_job():
+    # Test research job cancellation and retry endpoints
+    from unittest.mock import patch, AsyncMock
+    transport = ASGITransport(app=app)
+    with patch("app.application.start_research.execute_research_job", new_callable=AsyncMock), \
+         patch("app.api.routers.research_jobs.execute_research_job", new_callable=AsyncMock):
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            # Create a test profile
+            profile_payload = {
+                "full_name": "Test Student",
+                "nationality": "India",
+                "degree_level_target": "master",
+            }
+            res_prof = await client.post("/api/v1/profiles", json=profile_payload)
+            assert res_prof.status_code == 201
+            profile_id = res_prof.json()["id"]
+
+            # Start research job
+            res_job = await client.post("/api/v1/research-jobs", json={"profile_id": profile_id})
+            assert res_job.status_code == 202
+            job_id = res_job.json()["id"]
+
+            # Cancel research job
+            cancel_res = await client.post(f"/api/v1/research-jobs/{job_id}/cancel")
+            assert cancel_res.status_code == 200
+            assert cancel_res.json()["status"] == "cancelled"
+
+            # Retry cancelled job
+            retry_res = await client.post(f"/api/v1/research-jobs/{job_id}/retry")
+            assert retry_res.status_code == 202
+            assert retry_res.json()["status"] == "running"
