@@ -1,7 +1,6 @@
-"""Smoke test script for ScholarPilot AI providers.
-Validates credentials and live connectivity for Gemini, Groq, Tavily, and Brave.
-Run: python scripts/smoke_providers.py
-"""
+# Smoke test script for ScholarPilot AI providers.
+# Validates credentials and live connectivity for Gemini, Groq, Tavily, and Brave.
+# Run: python scripts/smoke_providers.py
 import asyncio
 import os
 import sys
