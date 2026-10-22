@@ -1,17 +1,18 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from app.config import get_settings
 from app.infrastructure.db import init_db
-
+from app.domain.errors import DomainError
+from app.api.errors import domain_error_handler, validation_error_handler
+from app.api.routers import profiles, documents, research_jobs, drafts
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Initialize tables if not exist
+    # Initialize database tables on server startup
     await init_db()
     yield
-    # Shutdown
-
 
 def create_app() -> FastAPI:
     settings = get_settings()
@@ -23,7 +24,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # CORS configuration
+    # Enable CORS for React frontend origin
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[settings.FRONTEND_ORIGIN, "http://localhost:5173", "http://127.0.0.1:5173"],
@@ -31,6 +32,18 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Register central error handlers for domain and validation exceptions
+    app.add_exception_handler(DomainError, domain_error_handler)
+    app.add_exception_handler(RequestValidationError, validation_error_handler)
+
+    # Mount v1 API routers
+    v1_router = APIRouter(prefix="/api/v1")
+    v1_router.include_router(profiles.router)
+    v1_router.include_router(documents.router)
+    v1_router.include_router(research_jobs.router)
+    v1_router.include_router(drafts.router)
+    app.include_router(v1_router)
 
     @app.get("/health", tags=["Health"])
     async def health_check():
@@ -64,7 +77,6 @@ def create_app() -> FastAPI:
         }
 
     return app
-
 
 app = create_app()
 
