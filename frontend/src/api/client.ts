@@ -1,6 +1,6 @@
-// API client with capability token injection and Problem Details error handling
-
-const API_BASE = import.meta.env.VITE_API_URL || '';
+// Base API URL with trailing slash cleanup for reliable routing
+const rawBase = import.meta.env.VITE_API_URL || '';
+const API_BASE = rawBase.replace(/\/+$/, '');
 
 export class ApiError extends Error {
   status: number;
