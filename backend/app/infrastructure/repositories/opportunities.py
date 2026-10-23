@@ -38,7 +38,7 @@ class OpportunityRepository:
                 data=opp.model_dump(mode="json"),
                 created_at=datetime.utcnow(),
             )
-            self.session.add(model)
+            await self.session.merge(model)
         await self.session.commit()
 
     async def save_assessments(
@@ -56,7 +56,7 @@ class OpportunityRepository:
                 assessments=[a.model_dump(mode="json") for a in assessments],
                 computed_at=datetime.utcnow(),
             )
-            self.session.add(model)
+            await self.session.merge(model)
         await self.session.commit()
 
     async def save_rankings(self, job_id: str, ranked_list: List[RankedOpportunity]) -> None:
@@ -70,7 +70,7 @@ class OpportunityRepository:
                 rationale=r.rationale,
                 data=r.model_dump(mode="json"),
             )
-            self.session.add(model)
+            await self.session.merge(model)
         await self.session.commit()
 
     async def get_results_summary(self, job_id: str) -> Dict[str, Any]:

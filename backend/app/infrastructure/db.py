@@ -22,8 +22,9 @@ def normalize_database_url(raw_url: str) -> Tuple[str, Dict[str, Any]]:
         url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
     if "asyncpg" in url:
-        # asyncpg does not accept sslmode or channel_binding as query parameters;
-        # it expects ssl via connect_args.
+        # asyncpg requires statement_cache_size=0 for pgBouncer and Neon transaction poolers
+        connect_args["statement_cache_size"] = 0
+        # asyncpg does not accept sslmode query parameter; pass ssl=require via connect_args
         if "?" in url:
             base_url, query_str = url.split("?", 1)
             parsed_query = parse_qs(query_str)
@@ -44,6 +45,7 @@ engine = create_async_engine(
     echo=settings.ENV == "dev" and settings.LOG_LEVEL == "DEBUG",
     connect_args=connect_args,
     pool_pre_ping=True,
+    pool_recycle=300,
 )
 
 # Enable foreign keys for SQLite if SQLite is used
