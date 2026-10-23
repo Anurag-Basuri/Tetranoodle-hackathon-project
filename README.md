@@ -10,6 +10,8 @@
 [![PostgreSQL](https://img.shields.io/badge/Neon-PostgreSQL%20Async-4169E1.svg)](https://neon.tech/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC.svg)](https://tailwindcss.com/)
 [![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg)](https://www.docker.com/)
+[![Render](https://img.shields.io/badge/Render-Backend%20Ready-46E3B7.svg)](https://render.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Frontend%20Ready-black.svg)](https://vercel.com/)
 
 ---
 
@@ -27,8 +29,9 @@
     - [Option A: Running with Docker](#option-a-running-with-docker-recommended)
     - [Option B: Running Locally from Source](#option-b-running-locally-from-source)
     - [Option C: Offline Demo Mode](#option-c-offline-demo-mode-instant-evaluator-backup)
-11. [REST API Reference](#-rest-api-reference)
-12. [Hackathon Rubric Alignment (100/100)](#-hackathon-rubric-alignment-100100)
+11. [Cloud Deployment (Render & Vercel)](#-cloud-deployment-render--vercel)
+12. [REST API Reference](#-rest-api-reference)
+13. [Hackathon Rubric Alignment (100/100)](#-hackathon-rubric-alignment-100100)
 
 ---
 
@@ -333,6 +336,17 @@ Evaluators can immediately review:
 - The 6-factor score breakdowns.
 - The criteria evaluation tables.
 - The slide-over verbatim source excerpts in the Evidence Drawer.
+
+---
+
+## ☁️ Cloud Deployment (Render & Vercel)
+
+ScholarPilot AI is production-ready for zero-downtime cloud hosting:
+- **Backend on Render**: Automated Blueprint deployment via `render.yaml`, native Python 3.11 web service on dynamic `$PORT`, health check at `/health`.
+- **Frontend on Vercel**: Vite SPA with route rewrites via `vercel.json` and client-side capability tokens.
+- **Database on Neon**: Serverless PostgreSQL with SSL connection pooling (`DATABASE_URL`).
+
+👉 **Read the complete step-by-step instructions in the [Deployment Guide (DEPLOYMENT.md)](file:///d:/projects/Tetranoodle%20hackathon%20project/DEPLOYMENT.md)**.
 
 ---
 
