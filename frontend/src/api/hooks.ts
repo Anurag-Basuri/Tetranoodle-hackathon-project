@@ -87,9 +87,18 @@ export function useStartResearchJob() {
 }
 
 export function useJob(jobId?: string) {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ['job', jobId],
-    queryFn: () => apiRequest<JobOut>(`/api/v1/research-jobs/${jobId}`),
+    queryFn: async () => {
+      const data = await apiRequest<JobOut>(`/api/v1/research-jobs/${jobId}`);
+      // Invalidate results when job reaches terminal status so UI updates immediately
+      if (data.status === 'completed' || data.status === 'completed_with_warnings' || data.status === 'failed') {
+        queryClient.invalidateQueries({ queryKey: ['results', jobId] });
+        queryClient.invalidateQueries({ queryKey: ['events', jobId] });
+      }
+      return data;
+    },
     enabled: Boolean(jobId),
     refetchInterval: (query) => {
       const status = query.state.data?.status;
@@ -107,6 +116,7 @@ export function useJobEvents(jobId?: string, isLive: boolean = true) {
     queryFn: () => apiRequest<EventsResponse>(`/api/v1/research-jobs/${jobId}/events?limit=300`),
     enabled: Boolean(jobId),
     refetchInterval: isLive ? 1500 : false,
+    staleTime: 0,
   });
 }
 
@@ -115,7 +125,8 @@ export function useJobResults(jobId?: string, enabled: boolean = true) {
     queryKey: ['results', jobId],
     queryFn: () => apiRequest<ResultsOut>(`/api/v1/research-jobs/${jobId}/results`),
     enabled: Boolean(jobId) && enabled,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 

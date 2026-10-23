@@ -11,13 +11,32 @@ DEGREE_ORDER = {
     DegreeLevel.PHD: 3,
 }
 
+def normalize_degree_level(raw: Optional[str]) -> Optional[DegreeLevel]:
+    # Normalizes extracted degree strings to standard DegreeLevel enum
+    if not raw:
+        return None
+    s = raw.lower().strip()
+    if "phd" in s or "doctor" in s:
+        return DegreeLevel.PHD
+    if "master" in s or "msc" in s or "m.sc" in s or "postgraduate" in s:
+        return DegreeLevel.MASTER
+    if "bachelor" in s or "bsc" in s or "b.sc" in s or "undergraduate" in s or "first degree" in s or "b.tech" in s:
+        return DegreeLevel.BACHELOR
+    try:
+        return DegreeLevel(s)
+    except ValueError:
+        return None
+
 def evaluate_degree_level(criterion: Criterion, profile: StudentProfile) -> tuple[CriterionStatus, str, Optional[str]]:
     # Compare student degree against required minimum
     min_level_str = criterion.params.get("min_level")
     if not min_level_str:
         return CriterionStatus.UNKNOWN, "No degree level requirement specified", None
 
-    min_level = DegreeLevel(min_level_str.lower())
+    min_level = normalize_degree_level(min_level_str)
+    if not min_level:
+        return CriterionStatus.NEEDS_REVIEW, f"Degree requirement '{min_level_str}' needs review", "Verify program prerequisites"
+
     if not profile.degree_level_held:
         return CriterionStatus.UNKNOWN, "Student held degree level is missing", "Provide current degree status"
 

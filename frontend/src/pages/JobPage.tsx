@@ -32,12 +32,27 @@ export const JobPage: React.FC = () => {
   // Queries and mutations
   const { data: job, isLoading: jobLoading, refetch: refetchJob } = useJob(jobId);
   const isTerminal = job?.status === 'completed' || job?.status === 'completed_with_warnings' || job?.status === 'failed' || job?.status === 'cancelled';
-  const { data: eventsData } = useJobEvents(jobId, !isTerminal);
-  const { data: results, isLoading: resultsLoading } = useJobResults(jobId, isTerminal || Boolean(job?.status));
+  const { data: eventsData, refetch: refetchEvents } = useJobEvents(jobId, !isTerminal);
+  const { data: results, isLoading: resultsLoading, refetch: refetchResults } = useJobResults(jobId, Boolean(jobId));
+
+  // Auto-refetch results and events when job transitions to terminal status
+  React.useEffect(() => {
+    if (isTerminal) {
+      refetchResults();
+      refetchEvents();
+    }
+  }, [isTerminal]);
 
   const cancelJob = useCancelJob();
   const retryJob = useRetryJob();
   const generateDraft = useGenerateDraft();
+
+  // Unified manual refresh
+  const handleRefreshAll = () => {
+    refetchJob();
+    refetchResults();
+    refetchEvents();
+  };
 
   // Local UI state
   const [activeTab, setActiveTab] = useState<'top' | 'all' | 'profile' | 'warnings'>('top');
@@ -125,11 +140,11 @@ export const JobPage: React.FC = () => {
           )}
 
           <button
-            onClick={() => refetchJob()}
+            onClick={handleRefreshAll}
             className="p-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 transition-colors"
-            title="Refresh Status"
+            title="Refresh Status & Results"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${jobLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${(jobLoading || resultsLoading) ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
