@@ -78,21 +78,24 @@ export const JobPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
       {/* Header bar */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono text-slate-400">Job: {jobId}</span>
+            <span className="text-[11px] font-mono text-zinc-500">ID: {jobId}</span>
             <StatusPill status={currentStatus} />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          <h1 className="text-lg sm:text-xl font-semibold text-zinc-100 tracking-tight">
             Evidence-Backed Eligibility Report
           </h1>
-          <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+          <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1">
             <span>Started: {job?.started_at ? new Date(job.started_at).toLocaleTimeString() : 'Queued'}</span>
             {job?.finished_at && (
-              <span>• Finished: {new Date(job.finished_at).toLocaleTimeString()}</span>
+              <>
+                <span>•</span>
+                <span>Finished: {new Date(job.finished_at).toLocaleTimeString()}</span>
+              </>
             )}
           </div>
         </div>
@@ -103,9 +106,9 @@ export const JobPage: React.FC = () => {
             <button
               onClick={handleCancel}
               disabled={cancelJob.isPending}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors"
             >
-              <StopCircle className="w-4 h-4 text-rose-400" />
+              <StopCircle className="w-3.5 h-3.5 text-rose-400" />
               Cancel Job
             </button>
           )}
@@ -114,98 +117,98 @@ export const JobPage: React.FC = () => {
             <button
               onClick={handleRetry}
               disabled={retryJob.isPending}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 text-xs font-semibold shadow-sm transition-colors"
             >
-              <RefreshCw className="w-4 h-4" />
-              Resume from Checkpoint
+              <RefreshCw className="w-3.5 h-3.5" />
+              Resume Checkpoint
             </button>
           )}
 
           <button
             onClick={() => refetchJob()}
-            className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-300 transition-colors"
+            className="p-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 transition-colors"
             title="Refresh Status"
           >
-            <RefreshCw className={`w-4 h-4 ${jobLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${jobLoading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
 
-      {/* Five-Lane Agent Swarm Timeline */}
+      {/* Multi-Agent Pipeline Visualizer */}
       <AgentTimeline events={events} jobStatus={currentStatus} />
 
-      {/* Results View Tabs */}
+      {/* Tabs and Results Section */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+        <div className="flex items-center gap-1 border-b border-zinc-800 pb-2">
           <button
             onClick={() => setActiveTab('top')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === 'top'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-zinc-800 text-zinc-100'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <Award className="w-4 h-4 text-indigo-400" />
-            Top 5 Ranked Scholarships ({results?.top?.length || 0})
+            <Award className="w-3.5 h-3.5 text-zinc-400" />
+            Top 5 Recommendations ({results?.top?.length || 0})
           </button>
 
           <button
             onClick={() => setActiveTab('all')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === 'all'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-zinc-800 text-zinc-100'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <ListFilter className="w-4 h-4 text-sky-400" />
+            <ListFilter className="w-3.5 h-3.5 text-zinc-400" />
             All Candidates Discovered ({results?.all?.length || 0})
           </button>
 
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === 'profile'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-zinc-800 text-zinc-100'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <UserCheck className="w-4 h-4 text-teal-400" />
-            Profile & GitHub Enrichment
+            <UserCheck className="w-3.5 h-3.5 text-zinc-400" />
+            Profile & Footprint
           </button>
 
           {results?.warnings && results.warnings.length > 0 && (
             <button
               onClick={() => setActiveTab('warnings')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 activeTab === 'warnings'
-                  ? 'bg-amber-600/20 text-amber-300 border border-amber-500/30'
+                  ? 'bg-amber-950/40 text-amber-300 border border-amber-800/50'
                   : 'text-amber-400/80 hover:text-amber-300'
               }`}
             >
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
               Warnings ({results.warnings.length})
             </button>
           )}
         </div>
 
-        {/* Tab 1: Top 5 Scholarships */}
+        {/* Tab 1: Top 5 Recommendations */}
         {activeTab === 'top' && (
           <div className="space-y-4">
             {resultsLoading && (
-              <div className="p-12 text-center text-slate-400 space-y-3">
-                <RefreshCw className="w-8 h-8 animate-spin text-indigo-500 mx-auto" />
-                <p className="text-sm">Agents evaluating criteria and computing 6-factor ranking...</p>
+              <div className="p-8 text-center text-zinc-400 space-y-2">
+                <RefreshCw className="w-5 h-5 animate-spin text-zinc-400 mx-auto" />
+                <p className="text-xs">Evaluating criteria and computing rankings...</p>
               </div>
             )}
 
             {!resultsLoading && (!results?.top || results.top.length === 0) && (
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 space-y-2">
-                <p className="text-sm font-medium text-slate-300">
+              <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-8 text-center text-zinc-400 space-y-1.5">
+                <p className="text-xs font-medium text-zinc-300">
                   {currentStatus === 'running'
-                    ? 'Swarm agents are currently discovering opportunities and verifying official sources...'
+                    ? 'Swarm agents are discovering opportunities and verifying official sources...'
                     : 'No opportunities qualified for the Top 5 list based on current filters.'}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-[11px] text-zinc-500">
                   Review the "All Candidates" tab to see all assessed entries.
                 </p>
               </div>
@@ -225,29 +228,29 @@ export const JobPage: React.FC = () => {
 
         {/* Tab 2: All Discovered Candidates */}
         {activeTab === 'all' && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl overflow-x-auto">
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-400 font-medium">
-                  <th className="py-2.5 px-3">Opportunity Name</th>
-                  <th className="py-2.5 px-3">Institution</th>
-                  <th className="py-2.5 px-3">Country</th>
-                  <th className="py-2.5 px-3">Funding</th>
-                  <th className="py-2.5 px-3">Deadline</th>
-                  <th className="py-2.5 px-3">Verification</th>
-                  <th className="py-2.5 px-3">Overall Eligibility</th>
-                  <th className="py-2.5 px-3 text-right">Official Source</th>
+                <tr className="border-b border-zinc-800 text-zinc-400 font-medium">
+                  <th className="py-2 px-3">Opportunity</th>
+                  <th className="py-2 px-3">Institution</th>
+                  <th className="py-2 px-3">Country</th>
+                  <th className="py-2 px-3">Funding</th>
+                  <th className="py-2 px-3">Deadline</th>
+                  <th className="py-2 px-3">Verification</th>
+                  <th className="py-2 px-3">Eligibility</th>
+                  <th className="py-2 px-3 text-right">Official Source</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
                 {results?.all?.map((cand) => (
-                  <tr key={cand.id} className="hover:bg-slate-800/30">
-                    <td className="py-2.5 px-3 font-semibold text-white max-w-[200px] truncate" title={cand.name}>
+                  <tr key={cand.id} className="hover:bg-zinc-800/30">
+                    <td className="py-2.5 px-3 font-medium text-zinc-200 max-w-[200px] truncate" title={cand.name}>
                       {cand.name}
                     </td>
-                    <td className="py-2.5 px-3 text-slate-400">{cand.institution || '—'}</td>
+                    <td className="py-2.5 px-3 text-zinc-400">{cand.institution || '—'}</td>
                     <td className="py-2.5 px-3">{cand.country || '—'}</td>
-                    <td className="py-2.5 px-3 uppercase text-slate-400">{cand.funding_type?.replace('_', ' ')}</td>
+                    <td className="py-2.5 px-3 capitalize text-zinc-400">{cand.funding_type?.replace('_', ' ')}</td>
                     <td className="py-2.5 px-3">{cand.deadline || 'Ongoing'}</td>
                     <td className="py-2.5 px-3">
                       <StatusPill status={cand.verification_status} size="sm" />
@@ -261,13 +264,13 @@ export const JobPage: React.FC = () => {
                           href={cand.official_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sky-400 hover:text-sky-300 text-[11px]"
+                          className="inline-flex items-center gap-1 text-zinc-400 hover:text-zinc-200 text-[11px] underline underline-offset-2"
                         >
+                          Official
                           <ExternalLink className="w-3 h-3" />
-                          View
                         </a>
                       ) : (
-                        <span className="text-slate-600 text-[11px]">Unreachable</span>
+                        <span className="text-zinc-600 text-[11px]">Unreachable</span>
                       )}
                     </td>
                   </tr>
@@ -277,52 +280,52 @@ export const JobPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 3: Profile & GitHub Enrichment */}
+        {/* Tab 3: Profile & Footprint */}
         {activeTab === 'profile' && results?.profile && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-5 space-y-5">
             <div>
-              <h3 className="text-base font-bold text-white mb-1">
+              <h3 className="text-sm font-semibold text-zinc-100">
                 {results.profile.full_name} ({results.profile.nationality})
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400 mt-0.5">
                 {results.profile.degree_level_target?.toUpperCase()} in {results.profile.field_of_study} • CGPA {results.profile.grade?.value}/{results.profile.grade?.scale}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 space-y-2">
-                <span className="font-semibold text-slate-300 uppercase tracking-wider text-[11px]">Academic Preferences</span>
-                <div className="text-slate-400">Target Countries: {results.profile.target_countries?.join(', ')}</div>
-                <div className="text-slate-400">Interests: {results.profile.interests?.join(', ')}</div>
-                <div className="text-slate-400">Funding Need: {results.profile.needs_funding ? 'Yes (requires funding)' : 'No'}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+              <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-2">
+                <span className="font-medium text-zinc-300 uppercase tracking-wider text-[11px]">Academic Preferences</span>
+                <div className="text-zinc-400">Target Destinations: {results.profile.target_countries?.join(', ')}</div>
+                <div className="text-zinc-400">Interests: {results.profile.interests?.join(', ')}</div>
+                <div className="text-zinc-400">Funding Requirement: {results.profile.needs_funding ? 'Yes (requires funding)' : 'No'}</div>
               </div>
 
-              <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 space-y-2">
-                <span className="font-semibold text-slate-300 uppercase tracking-wider text-[11px]">GitHub Profile Enrichment</span>
+              <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-2">
+                <span className="font-medium text-zinc-300 uppercase tracking-wider text-[11px]">GitHub Enriched Projects</span>
                 {results.profile.github_url ? (
                   <>
                     <a
                       href={results.profile.github_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-mono text-[11px]"
+                      className="text-blue-400 hover:text-blue-300 flex items-center gap-1 font-mono text-[11px]"
                     >
-                      <ExternalLink className="w-3 h-3" />
                       {results.profile.github_url}
+                      <ExternalLink className="w-3 h-3" />
                     </a>
                     {results.profile.projects && results.profile.projects.length > 0 && (
                       <div className="space-y-1.5 mt-2">
                         {results.profile.projects.map((p, idx) => (
-                          <div key={idx} className="p-2 rounded bg-slate-900/80 border border-slate-800 text-[11px]">
-                            <div className="font-semibold text-white">{p.name}</div>
-                            <div className="text-slate-400">{p.summary}</div>
+                          <div key={idx} className="p-2 rounded bg-zinc-900 border border-zinc-800 text-[11px]">
+                            <div className="font-medium text-zinc-200">{p.name}</div>
+                            <div className="text-zinc-400">{p.summary}</div>
                           </div>
                         ))}
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-slate-500 italic">No public GitHub profile supplied.</div>
+                  <div className="text-zinc-500 italic">No public GitHub profile supplied.</div>
                 )}
               </div>
             </div>
@@ -331,12 +334,12 @@ export const JobPage: React.FC = () => {
 
         {/* Tab 4: Agent Warnings & Audit */}
         {activeTab === 'warnings' && results?.warnings && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {results.warnings.map((w, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-amber-950/30 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-3">
+              <div key={idx} className="p-3.5 rounded-lg bg-amber-950/20 border border-amber-800/40 text-amber-200 text-xs flex items-start gap-2.5">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-amber-300 uppercase tracking-wider text-[10px]">[{w.agent}] </span>
+                  <span className="font-medium text-amber-300 uppercase tracking-wider text-[10px]">[{w.agent}] </span>
                   <span>{w.message}</span>
                 </div>
               </div>

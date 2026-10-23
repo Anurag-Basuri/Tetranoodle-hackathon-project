@@ -1,4 +1,4 @@
-// Five-lane multi-agent swarm progress visualizer and live event log
+// Multi-agent pipeline visualizer and execution log stream
 
 import React from 'react';
 import {
@@ -8,8 +8,8 @@ import {
   CheckSquare,
   Award,
   Terminal,
-  Clock,
-  CheckCircle2,
+  Check,
+  Loader2,
   AlertTriangle,
 } from 'lucide-react';
 import type { JobEvent, JobStatus } from '../types/api';
@@ -19,24 +19,24 @@ interface AgentTimelineProps {
   jobStatus: JobStatus;
 }
 
-interface AgentLane {
+interface AgentStage {
   id: string;
+  step: number;
   name: string;
   role: string;
   icon: React.ElementType;
 }
 
-const LANES: AgentLane[] = [
-  { id: 'profile_analyst', name: 'Profile Analyst', role: 'Record Extraction & GitHub', icon: UserCheck },
-  { id: 'opportunity_scout', name: 'Opportunity Scout', role: 'Search & Candidates (≥12)', icon: Search },
-  { id: 'verification_agent', name: 'Verification Agent', role: 'Official Sources & RapidFuzz Quote', icon: ShieldCheck },
-  { id: 'eligibility_analyst', name: 'Eligibility Analyst', role: 'Deterministic Rules & Gaps', icon: CheckSquare },
-  { id: 'ranking_application_agent', name: 'Ranking & SOP Agent', role: '6-Factor Scoring & SOP Draft', icon: Award },
+const STAGES: AgentStage[] = [
+  { id: 'profile_analyst', step: 1, name: 'Profile Analyst', role: 'Records & GitHub', icon: UserCheck },
+  { id: 'opportunity_scout', step: 2, name: 'Opportunity Scout', role: 'Discovery (≥12)', icon: Search },
+  { id: 'verification_agent', step: 3, name: 'Verification Agent', role: 'Official sources', icon: ShieldCheck },
+  { id: 'eligibility_analyst', step: 4, name: 'Eligibility Analyst', role: 'Rules & gaps', icon: CheckSquare },
+  { id: 'ranking_application_agent', step: 5, name: 'Ranking & SOP', role: '6-Factor scoring', icon: Award },
 ];
 
 export const AgentTimeline: React.FC<AgentTimelineProps> = ({ events, jobStatus }) => {
-  // Derive status for each agent from emitted events
-  const getAgentStatus = (agentId: string) => {
+  const getStageStatus = (agentId: string) => {
     if (jobStatus === 'completed' || jobStatus === 'completed_with_warnings') {
       return 'completed';
     }
@@ -51,88 +51,88 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({ events, jobStatus 
   };
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-xl space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-4">
+      {/* Pipeline Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
         <div>
-          <h2 className="text-base font-semibold text-white flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
-            Autonomous Agent Swarm
-          </h2>
-          <p className="text-xs text-slate-400">Cooperative parallel pipeline with isolated failure domains</p>
+          <h2 className="text-sm font-semibold text-zinc-100">Research Pipeline</h2>
+          <p className="text-xs text-zinc-400">Cooperative agent workflow across five specialized stages</p>
         </div>
-        <span className="text-xs font-mono text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700">
-          {events.length} events logged
-        </span>
+        <div className="text-xs font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded">
+          {events.length} events
+        </div>
       </div>
 
-      {/* 5-Lane agent grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        {LANES.map((lane) => {
-          const status = getAgentStatus(lane.id);
-          const Icon = lane.icon;
+      {/* 5 Pipeline stages */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+        {STAGES.map((stage) => {
+          const status = getStageStatus(stage.id);
+          const Icon = stage.icon;
 
-          let badgeColor = 'bg-slate-800/60 border-slate-700 text-slate-400';
-          let indicator = <Clock className="w-3.5 h-3.5 text-slate-500" />;
+          let cardBorder = 'border-zinc-800 bg-zinc-900/40 text-zinc-400';
+          let statusBadge = (
+            <span className="w-4 h-4 rounded-full border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500 font-mono">
+              {stage.step}
+            </span>
+          );
 
           if (status === 'active') {
-            badgeColor = 'bg-indigo-950/40 border-indigo-500/50 text-indigo-300 ring-1 ring-indigo-500/30';
-            indicator = <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />;
+            cardBorder = 'border-blue-700/60 bg-blue-950/20 text-blue-200';
+            statusBadge = <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />;
           } else if (status === 'completed') {
-            badgeColor = 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300';
-            indicator = <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />;
+            cardBorder = 'border-zinc-800 bg-zinc-900/60 text-zinc-300';
+            statusBadge = (
+              <span className="w-4 h-4 rounded-full bg-emerald-950 border border-emerald-800/80 flex items-center justify-center">
+                <Check className="w-2.5 h-2.5 text-emerald-400" />
+              </span>
+            );
           } else if (status === 'error') {
-            badgeColor = 'bg-rose-950/30 border-rose-500/30 text-rose-300';
-            indicator = <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />;
+            cardBorder = 'border-rose-900/60 bg-rose-950/20 text-rose-300';
+            statusBadge = <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />;
           }
 
           return (
             <div
-              key={lane.id}
-              className={`p-3.5 rounded-xl border transition-all ${badgeColor} relative overflow-hidden`}
+              key={stage.id}
+              className={`p-3 rounded-lg border transition-colors ${cardBorder}`}
             >
-              <div className="flex items-start justify-between mb-2">
-                <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800">
-                  <Icon className="w-4 h-4 text-indigo-400" />
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-medium">
-                  {indicator}
-                  <span className="capitalize">{status}</span>
-                </div>
+              <div className="flex items-center justify-between mb-1.5">
+                <Icon className="w-4 h-4 text-zinc-400" />
+                {statusBadge}
               </div>
-
-              <div className="text-xs font-semibold text-white tracking-tight">{lane.name}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">{lane.role}</div>
+              <div className="text-xs font-medium text-zinc-200 leading-tight">{stage.name}</div>
+              <div className="text-[11px] text-zinc-400 mt-0.5">{stage.role}</div>
             </div>
           );
         })}
       </div>
 
-      {/* Live chronological stream */}
-      <div className="bg-slate-950/90 rounded-xl border border-slate-800/80 p-3.5">
-        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-800 text-xs font-mono text-slate-400">
-          <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-          <span>Real-Time Execution Logs</span>
+      {/* Execution Logs Terminal */}
+      <div className="bg-zinc-950 rounded-lg border border-zinc-800/80 p-3">
+        <div className="flex items-center gap-1.5 pb-2 mb-2 border-b border-zinc-900 text-[11px] font-mono text-zinc-400">
+          <Terminal className="w-3 h-3 text-zinc-400" />
+          <span>Execution Stream</span>
         </div>
-        <div className="max-h-48 overflow-y-auto space-y-2 font-mono text-xs pr-1">
+        <div className="max-h-40 overflow-y-auto space-y-1.5 font-mono text-[11px] pr-1">
           {events.length === 0 ? (
-            <div className="text-slate-500 italic py-2 text-center">Awaiting swarm event stream...</div>
+            <div className="text-zinc-500 italic py-2 text-center text-xs">Awaiting events...</div>
           ) : (
-            events.slice(-15).map((evt) => {
-              let badge = 'text-slate-400 bg-slate-800/50';
-              if (evt.level === 'info') badge = 'text-sky-300 bg-sky-950/50 border border-sky-800/40';
-              if (evt.level === 'success') badge = 'text-emerald-300 bg-emerald-950/50 border border-emerald-800/40';
-              if (evt.level === 'warning') badge = 'text-amber-300 bg-amber-950/50 border border-amber-800/40';
-              if (evt.level === 'error') badge = 'text-rose-300 bg-rose-950/50 border border-rose-800/40';
+            events.slice(-20).map((evt) => {
+              let tagColor = 'text-zinc-400';
+              if (evt.level === 'info') tagColor = 'text-blue-400';
+              if (evt.level === 'success') tagColor = 'text-emerald-400';
+              if (evt.level === 'warning') tagColor = 'text-amber-400';
+              if (evt.level === 'error') tagColor = 'text-rose-400';
 
               return (
-                <div key={evt.seq} className="flex items-start gap-2.5 text-[11px] leading-relaxed">
-                  <span className="text-slate-500 shrink-0 select-none">
+                <div key={evt.seq} className="flex items-start gap-2 leading-relaxed">
+                  <span className="text-zinc-600 shrink-0 select-none">
                     {new Date(evt.at).toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' })}
                   </span>
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-semibold shrink-0 ${badge}`}>
-                    {evt.agent.replace('_', ' ')}
+                  <span className={`shrink-0 font-medium ${tagColor}`}>
+                    [{evt.agent.replace('_', ' ')}]
                   </span>
-                  <span className="text-slate-300">{evt.message}</span>
+                  <span className="text-zinc-300">{evt.message}</span>
                 </div>
               );
             })

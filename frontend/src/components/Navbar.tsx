@@ -1,42 +1,37 @@
-// Header navigation component with brand, status indicator, and quick links
+// Navigation bar with clean typography and understated controls
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Compass, GitBranch } from 'lucide-react';
+import { GraduationCap, GitBranch } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const lastJobId = localStorage.getItem('scholarpilot_last_job_id');
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand logo */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-sky-400 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/30 transition-all">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <Compass className="w-5 h-5 text-indigo-400 group-hover:rotate-45 transition-transform duration-300" />
-            </div>
+    <header className="sticky top-0 z-40 w-full border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        {/* Brand */}
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200">
+            <GraduationCap className="w-4 h-4 text-zinc-300" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-lg text-white tracking-tight">ScholarPilot</span>
-              <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full">
-                AI Swarm
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 font-normal">Evidence-Backed Scholarship Engine</p>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm text-zinc-100 tracking-tight">ScholarPilot</span>
+            <span className="text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.2 rounded">
+              research
+            </span>
           </div>
         </Link>
 
         {/* Navigation links */}
-        <nav className="flex items-center gap-1 sm:gap-4">
+        <nav className="flex items-center gap-3 sm:gap-4">
           <Link
             to="/"
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`text-xs font-medium px-2.5 py-1.5 rounded-md transition-colors ${
               location.pathname === '/'
-                ? 'bg-slate-800 text-white border border-slate-700'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-zinc-800/80 text-zinc-100'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             New Intake
@@ -45,29 +40,26 @@ export const Navbar: React.FC = () => {
           {lastJobId && (
             <Link
               to={`/jobs/${lastJobId}`}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`text-xs font-medium px-2.5 py-1.5 rounded-md transition-colors ${
                 location.pathname.startsWith('/jobs')
-                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  ? 'bg-zinc-800/80 text-zinc-100'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              Active Report
+              Latest Report
             </Link>
           )}
 
-          <div className="hidden md:flex items-center gap-2 pl-4 border-l border-slate-800 text-xs text-emerald-400">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            Agents Online
+          <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-zinc-800 text-xs text-zinc-400 font-normal">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>Operational</span>
           </div>
 
           <a
             href="https://github.com/Anurag-Basuri/Tetranoodle-hackathon-project"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors ml-2"
+            className="p-1.5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-md transition-colors"
             title="GitHub Repository"
           >
             <GitBranch className="w-4 h-4" />

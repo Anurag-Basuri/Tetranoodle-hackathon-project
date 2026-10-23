@@ -22,7 +22,7 @@ export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+        <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
           <Navbar />
           <main className="flex-1">
             <Routes>
@@ -32,8 +32,8 @@ export const App: React.FC = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
-          <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-            ScholarPilot AI • Built for TetraNoodle AI Hackathon 2026 • Autonomous Evidence-Backed Scholarship Research
+          <footer className="border-t border-zinc-900 py-6 text-center text-xs text-zinc-500">
+            ScholarPilot • Built for TetraNoodle AI Hackathon 2026 • Evidence-Backed Scholarship Research
           </footer>
         </div>
       </BrowserRouter>
